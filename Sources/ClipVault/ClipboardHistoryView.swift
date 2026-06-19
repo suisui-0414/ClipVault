@@ -6,7 +6,6 @@ struct ClipboardHistoryView: View {
     var onSelect: (ClipboardItem) -> Void
     var onDelete: (ClipboardItem) -> Void
     var onClear: () -> Void
-    var onQuit: () -> Void
     var onClose: () -> Void
 
     private static let dateFormatter: DateFormatter = {
@@ -16,22 +15,41 @@ struct ClipboardHistoryView: View {
         return f
     }()
 
+    private let listHeight: CGFloat = 260
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if monitor.items.isEmpty {
-                Text("履歴はありません")
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-            } else {
-                ForEach(Array(monitor.items.enumerated()), id: \.element.id) { index, item in
-                    rowButton(item, isSelected: index == selectedIndex)
+            Group {
+                if monitor.items.isEmpty {
+                    VStack {
+                        Spacer()
+                        Text("履歴はありません")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                } else {
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 0) {
+                                ForEach(Array(monitor.items.enumerated()), id: \.element.id) { index, item in
+                                    rowButton(item, isSelected: index == selectedIndex)
+                                        .id(index)
+                                }
+                            }
+                        }
+                        .onChange(of: selectedIndex) { newValue in
+                            guard let newValue else { return }
+                            proxy.scrollTo(newValue, anchor: .center)
+                        }
+                    }
                 }
+            }
+            .frame(height: listHeight)
+
+            if !monitor.items.isEmpty {
                 Divider()
                 footerButton("履歴をクリア", action: onClear)
             }
-            Divider()
-            footerButton("終了", action: onQuit)
         }
         .padding(.vertical, 6)
         .frame(width: 300)

@@ -1,6 +1,7 @@
 import AppKit
 import Carbon.HIToolbox
 import Combine
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -14,11 +15,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        registerAsLoginItemIfNeeded()
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.button?.image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "ClipVault")
         statusItem.button?.target = self
-        statusItem.button?.action = #selector(togglePanel)
+        statusItem.button?.action = #selector(handleStatusItemClick)
+        statusItem.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
 
         panel = HistoryPanel(contentRect: NSRect(x: 0, y: 0, width: 300, height: 100))
         panel.onKeyDown = { [weak self] event in
@@ -46,12 +49,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    @objc private func togglePanel() {
+    private func registerAsLoginItemIfNeeded() {
+        let service = SMAppService.mainApp
+        switch service.status {
+        case .enabled, .requiresApproval:
+            return
+        default:
+            try? service.register()
+        }
+    }
+
+    @objc private func handleStatusItemClick() {
+        if NSApp.currentEvent?.type == .rightMouseUp {
+            showContextMenu()
+        } else {
+            togglePanel()
+        }
+    }
+
+    private func togglePanel() {
         if panel.isVisible {
             closePanel()
         } else {
             showPanel()
         }
+    }
+
+    private func showContextMenu() {
+        let menu = NSMenu()
+        let quitItem = NSMenuItem(title: "ClipVaultを終了", action: #selector(quitApp), keyEquivalent: "")
+        quitItem.target = self
+        menu.addItem(quitItem)
+        guard let button = statusItem.button else { return }
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.maxY), in: button)
+    }
+
+    @objc private func quitApp() {
+        NSApplication.shared.terminate(nil)
     }
 
     @objc private func panelResignedKey(_ notification: Notification) {
@@ -149,7 +183,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self.monitor.delete(item)
             },
             onClear: { [weak self] in self?.monitor.clearHistory() },
-            onQuit: { NSApplication.shared.terminate(nil) },
             onClose: { [weak self] in self?.closePanel() }
         )
         let hostingView = NSHostingView(rootView: view)
