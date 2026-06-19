@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ClipVault}",
+            "name": "Debug ClipVault",
+            "target": "ClipVault",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug ClipVault"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:ClipVault}",
+            "name": "Release ClipVault",
+            "target": "ClipVault",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release ClipVault"
+        }
+    ]
+}
