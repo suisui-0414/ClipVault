@@ -49,4 +49,4 @@ scripts/release.sh <version> [build]
 
 ## ライセンス
 
-特に指定なし。
+[MIT License](LICENSE)
