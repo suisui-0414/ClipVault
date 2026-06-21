@@ -52,8 +52,8 @@ PLIST
 echo "==> ad-hoc署名中"
 codesign --force --deep --sign - "$APP_DIR"
 
-echo "==> 既存プロセスを終了"
-pkill -f "${APP_NAME}.app/Contents/MacOS/${APP_NAME}" 2>/dev/null || true
+echo "==> 既存プロセスを終了 (リリース版・デバッグ版とも)"
+pkill -f "/${APP_NAME}\$" 2>/dev/null || true
 
 echo "==> /Applications に配置中"
 rm -rf "/Applications/${APP_NAME}.app"

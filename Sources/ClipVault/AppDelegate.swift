@@ -14,6 +14,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var selectedIndex: Int?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if terminateIfAlreadyRunning() { return }
+
         NSApp.setActivationPolicy(.accessory)
         registerAsLoginItemIfNeeded()
 
@@ -47,6 +49,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         hotKey = GlobalHotKey(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | shiftKey)) { [weak self] in
             self?.togglePanel()
         }
+    }
+
+    /// 同じバンドルIDのインスタンスが既に起動していれば、自分自身を終了する。
+    private func terminateIfAlreadyRunning() -> Bool {
+        guard let bundleID = Bundle.main.bundleIdentifier else { return false }
+        let myPID = ProcessInfo.processInfo.processIdentifier
+        let alreadyRunning = NSWorkspace.shared.runningApplications.contains {
+            $0.bundleIdentifier == bundleID && $0.processIdentifier != myPID
+        }
+        guard alreadyRunning else { return false }
+        NSApp.terminate(nil)
+        return true
     }
 
     private func registerAsLoginItemIfNeeded() {

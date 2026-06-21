@@ -1,6 +1,6 @@
 # ClipVault
 
-**v1.1**
+**v1.1.1**
 
 macOS用のメニューバー常駐型クリップボード履歴管理アプリです。Swift + SwiftUI(一部AppKit)で実装しています。
 
