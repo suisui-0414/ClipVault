@@ -45,8 +45,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self.rebuildPanelContent()
             }
 
-        // ⌘⇧V でメニューを開く
-        hotKey = GlobalHotKey(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | shiftKey)) { [weak self] in
+        // ⌃⌥V でメニューを開く
+        hotKey = GlobalHotKey(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(controlKey | optionKey)) { [weak self] in
             self?.togglePanel()
         }
     }
