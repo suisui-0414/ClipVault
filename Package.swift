@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "ClipVault",
+    name: "clip-vault",
     platforms: [.macOS(.v13)],
     targets: [
         .executableTarget(
             name: "ClipVault",
-            path: "Sources/ClipVault"
+            path: "Sources/clip-vault"
         )
     ]
 )
